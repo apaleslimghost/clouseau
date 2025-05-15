@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="stylesheet" href="index.css" />
+  </head>
+  <body>
+    <main>
+      <div class="toolbar">
+        <input type="text" id="url" placeholder="Enter URL" />
+        <div class="nav-buttons">
+          <button id="back">􀰌</button>
+          <button id="forward">􀰑</button>
+          <button id="reload">􀅈</button>
+        </div>
+      </div>
+      <div class="browser-container devtools">
+        <webview id="devtools" src="about:blank"></webview>
+      </div>
+      <div class="browser-container browser">
+        <webview id="browser" src="http://example.com"></webview>
+      </div>
+    </main>
+    <script>
+      const browserView = document.getElementById('browser')
+      const devtoolsView = document.getElementById('devtools')
+
+      const emittedOnce = (element, eventName) => new Promise(resolve => {
+        element.addEventListener(eventName, event => resolve(event), { once: true })
+      })
+
+      const browserReady = emittedOnce(browserView, 'dom-ready')
+      const devtoolsReady = emittedOnce(devtoolsView, 'dom-ready')
+      Promise.all([browserReady, devtoolsReady]).then(() => {
+        window.electronAPI.registerWebviews(browserView.getWebContentsId(), devtoolsView.getWebContentsId())
+
+        window.electron.ipcRenderer.on('focus-address-bar', () => {
+          urlInput.focus();
+          urlInput.select();
+        });
+      })
+
+      const urlInput = document.getElementById('url');
+      const goBtn = document.getElementById('go');
+      const backBtn = document.getElementById('back');
+      const forwardBtn = document.getElementById('forward');
+      const reloadBtn = document.getElementById('reload');
+
+      // Navigate to URL from address bar
+      urlInput.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+          let url = urlInput.value.trim();
+          if (!/^https?:\/\//i.test(url)) {
+            url = 'https://' + url;
+          }
+          browserView.loadURL(url);
+        }
+      });
+
+      // Navigation buttons
+      backBtn.addEventListener('click', () => browserView.goBack());
+      forwardBtn.addEventListener('click', () => browserView.goForward());
+      reloadBtn.addEventListener('click', () => browserView.reload());
+
+      // Update address bar on navigation
+      browserView.addEventListener('did-navigate', (e) => {
+        urlInput.value = e.url;
+      });
+      browserView.addEventListener('did-navigate-in-page', (e) => {
+        urlInput.value = e.url;
+      });
+
+      // Helper to update nav button states
+      function updateNavButtons() {
+        backBtn.disabled = !browserView.canGoBack();
+        forwardBtn.disabled = !browserView.canGoForward();
+      }
+
+      // Update nav buttons on navigation events
+      browserView.addEventListener('did-navigate', updateNavButtons);
+      browserView.addEventListener('did-navigate-in-page', updateNavButtons);
+      browserView.addEventListener('did-frame-finish-load', updateNavButtons);
+
+      // Initial state after webview is ready
+      browserView.addEventListener('dom-ready', updateNavButtons);
+
+      // Command-L to focus and select the address bar
+      window.addEventListener('keydown', (e) => {
+        if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'l') {
+          e.preventDefault();
+          urlInput.focus();
+          urlInput.select();
+        }
+      });
+    </script>
+  </body>
+</html>

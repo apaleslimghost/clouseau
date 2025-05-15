@@ -1,0 +1,122 @@
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica,
+    Arial, sans-serif;
+  margin: 0;
+  app-region: drag;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html, body, main {
+  height: 100%;
+}
+
+main {
+  display: grid;
+  grid-template: 'toolbar  browser' min-content
+                 'devtools browser' 1fr / auto 1fr;
+  gap: 1ex;
+  padding: 1ex;
+}
+
+.toolbar {
+  grid-area: toolbar;
+  margin-left: 84px;
+  background: rgba(255, 255, 255, 0.2);
+  color: rgba(255, 255, 255, 0.7);
+  border-radius: 1ex;
+  -electron-corner-smoothing: system-ui;
+  padding: 1ex 1.5ex;
+  display: flex;
+  justify-content: space-between;
+}
+
+
+.toolbar, .toolbar::before {
+  -electron-corner-smoothing: system-ui;
+  border-radius: 1.5ex;
+}
+
+.toolbar:has(input:focus) {
+  background: rgba(255, 255, 255, 0.7);
+  color: black;
+}
+
+.toolbar input, .toolbar button {
+  border: 0 none;
+  background-color: transparent;
+  color: inherit;
+  font: inherit;
+}
+
+.toolbar input {
+  flex-grow: 1;
+}
+
+.toolbar button {
+  font-family: 'SF Pro';
+  border-radius: 0.5ex;
+  width: 3ex;
+  height: 3ex;
+  -electron-corner-smoothing: system-ui;
+  cursor: pointer;
+  text-align: center;
+}
+
+button:disabled {
+  pointer-events: none;
+  opacity: 0.5;
+}
+
+.toolbar button:hover {
+  background: rgba(0, 0, 0, 0.3);
+}
+
+.toolbar input:focus {
+  outline: 0;
+}
+
+.toolbar > * {
+  app-region: no-drag;
+}
+
+.devtools {
+  grid-area: devtools;
+}
+
+.browser {
+  grid-area: browser;
+}
+
+.browser-container {
+  app-region: no-drag;
+  overflow: hidden;
+}
+
+.browser-container, .toolbar {
+  position: relative;
+}
+
+.browser-container::before, .toolbar::before {
+  content: '';
+  display: block;
+  z-index: -1;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  box-shadow: 0 0 2ex rgba(0, 0, 0, 0.5);
+}
+
+.browser-container, .browser-container::before {
+  -electron-corner-smoothing: system-ui;
+  border-radius: 0.5ex;
+}
+
+.browser-container webview {
+  width: 100%;
+  height: 100%;
+}
