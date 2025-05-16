@@ -33,11 +33,6 @@
       const devtoolsReady = emittedOnce(devtoolsView, 'dom-ready')
       Promise.all([browserReady, devtoolsReady]).then(() => {
         window.electronAPI.registerWebviews(browserView.getWebContentsId(), devtoolsView.getWebContentsId())
-
-        window.electron.ipcRenderer.on('focus-address-bar', () => {
-          urlInput.focus();
-          urlInput.select();
-        });
       })
 
       const urlInput = document.getElementById('url');

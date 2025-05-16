@@ -49,15 +49,7 @@ ipcMain.on('register-webviews', (event, targetContentsId, devtoolsContentsId) =>
   target.setDevToolsWebContents(devtools)
   target.openDevTools()
   devtools.executeJavaScript("window.location.reload()");
-
-  target.on('did-navigate', (event, url) => {
-    console.log(url)
-  })
 })
-
-ipcMain.on('focus-address-bar', (event) => {
-  event.sender.send('focus-address-bar');
-});
 
 // Quit when all windows are closed, except on macOS. There, it's common
 // for applications and their menu bar to stay active until the user quits
